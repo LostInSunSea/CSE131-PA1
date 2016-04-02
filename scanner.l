@@ -65,12 +65,18 @@ BOOLEAN   (true|false)
   * %% markers which delimit the Rules section. 
   */ 
 
-[\n]		  {currentLineNum++; currentColNum = 1;}
-"void" 		{return T_Void;}
-"bool"    {return T_Bool;}
-"true"    {yylval.boolConstant=true ;return T_BoolConstant;}
-"false"   {yylval.boolConstant=false; return T_BoolConstant;}
-[A-Za-z][A-Za-z0-9]{0,1023}  {strcpy(yylval.identifier,yytext);return T_Identifier;}
+[\n]		                      {currentLineNum++; currentColNum = 1;}
+"void" 		                    {return T_Void;}
+"bool"                        {return T_Bool;}
+"float"                       {return T_Float;}
+"int"                         {return T_Int;}
+"uint"                        {return T_Uint;}
+"true"                        {yylval.boolConstant=true ;return T_BoolConstant;}
+"false"                       {yylval.boolConstant=false; return T_BoolConstant;}
+[0-9]+                        {yylval.integerConstant=atoi(yytext); return T_IntConstant;}
+[0-9]+u                       {yylval.integerConstant=atoi(yytext); return T_UintConstant;}
+[0-9]+\.[0-9]*[fF]?           {yylval.floatConstant=atof(yytext); return T_FloatConstant;}
+[A-Za-z][A-Za-z0-9]{0,1023}   {strcpy(yylval.identifier,yytext);return T_Identifier;}
 %%
 
 /* The closing %% above marks the end of the Rules section and the beginning
