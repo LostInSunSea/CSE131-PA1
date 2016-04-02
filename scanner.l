@@ -65,10 +65,12 @@ BOOLEAN   (true|false)
   * %% markers which delimit the Rules section. 
   */ 
 
-[\n]		{currentLineNum++; currentColNum = 1;}
-
-void 		{return T_Void;}
-
+[\n]		  {currentLineNum++; currentColNum = 1;}
+"void" 		{return T_Void;}
+"bool"    {return T_Bool;}
+"true"    {yylval.boolConstant=true ;return T_BoolConstant;}
+"false"   {yylval.boolConstant=false; return T_BoolConstant;}
+[A-Za-z][A-Za-z0-9]{0,1023}  {strcpy(yylval.identifier,yytext);return T_Identifier;}
 %%
 
 /* The closing %% above marks the end of the Rules section and the beginning
@@ -114,3 +116,5 @@ static void DoBeforeEachAction()
     yylloc.last_column = currentColNum + yyleng - 1;
     currentColNum += yyleng;
 }
+
+
