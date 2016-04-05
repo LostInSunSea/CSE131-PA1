@@ -65,18 +65,84 @@ BOOLEAN   (true|false)
   * %% markers which delimit the Rules section. 
   */ 
 
-[\n]		                      {currentLineNum++; currentColNum = 1;}
-"void" 		                    {return T_Void;}
+<INITIAL,ML_COMMENT>[\n]      {currentLineNum++; currentColNum = 1;}
+\/\/.*[\n]                    {currentLineNum++; currentColNum = 1;}
+\/\*                          {BEGIN(ML_COMMENT);}
+<ML_COMMENT>\*\/              {BEGIN(INITIAL);}
+<ML_COMMENT>.                 {}
+"void"                        {return T_Void;}
 "bool"                        {return T_Bool;}
 "float"                       {return T_Float;}
 "int"                         {return T_Int;}
 "uint"                        {return T_Uint;}
+"mat2"                        {return T_Mat2;}
+"mat3"                        {return T_Mat3;}
+"mat4"                        {return T_Mat4;}
+"vec2"                        {return T_Vec2;}
+"vec3"                        {return T_Vec3;}
+"vec4"                        {return T_Vec4;}
+"ivec2"                       {return T_Ivec2;}
+"ivec3"                       {return T_Ivec3;}
+"ivec4"                       {return T_Ivec4;}
+"bvec2"                       {return T_Bvec2;}
+"bvec3"                       {return T_Bvec3;}
+"bvec4"                       {return T_Bvec4;}
+"uvec2"                       {return T_Uvec2;}
+"uvec3"                       {return T_Uvec3;}
+"uvec4"                       {return T_Uvec4;}
 "true"                        {yylval.boolConstant=true ;return T_BoolConstant;}
 "false"                       {yylval.boolConstant=false; return T_BoolConstant;}
+"if"                          {return T_If;}
+"else"                        {return T_Else;}
+"for"                         {return T_For;}
+"while"                       {return T_While;}
+"do"                          {return T_Do;}
+"break"                       {return T_Break;}
+"continue"                    {return T_Continue;}
+"switch"                      {return T_Switch;}
+"case"                        {return T_Case;}
+"default"                     {return T_Default;}
+"return"                      {return T_Return;}
+"in"                          {return T_In;}
+"out"                         {return T_Out;}
+"const"                       {return T_Const;}
+"uniform"                     {return T_Uniform;}
+"struct"                      {return T_Struct;}
 [0-9]+                        {yylval.integerConstant=atoi(yytext); return T_IntConstant;}
 [0-9]+u                       {yylval.integerConstant=atoi(yytext); return T_UintConstant;}
 [0-9]+\.[0-9]*[fF]?           {yylval.floatConstant=atof(yytext); return T_FloatConstant;}
 [A-Za-z][A-Za-z0-9]{0,1023}   {strcpy(yylval.identifier,yytext);return T_Identifier;}
+[ ]                           {}
+\t                            {currentColNum += 6;}
+"++"                          {return T_Inc;}
+"--"                          {return T_Dec;}
+"<="                          {return T_LessEqual;}
+">="                          {return T_GreaterEqual;}
+"=="                          {return T_EQ;}
+"!="                          {return T_NE;}
+"&&"                          {return T_And;}
+"||"                          {return T_Or;}
+"*="                          {return T_MulAssign;}
+"/="                          {return T_DivAssign;}
+"+="                          {return T_AddAssign;}
+"-="                          {return T_SubAssign;}
+"("                           {return T_LeftParen;}
+")"                           {return T_RightParen;}
+"{"                           {return T_LeftBracket;}
+"}"                           {return T_RightBracket;}
+"["                           {return T_LeftBrace;}
+"]"                           {return T_RightBrace;}
+"."                           {return T_Dot;}
+":"                           {return T_Colon;}
+"="                           {return T_Equal;}
+";"                           {return T_Semicolon;}
+"-"                           {return T_Dash;}
+"+"                           {return T_Plus;}
+"*"                           {return T_Star;}
+"/"                           {return T_Slash;}
+"<"                           {return T_LeftAngle;}
+">"                           {return T_RightAngle;}
+"?"                           {return T_Question;}
 %%
 
 /* The closing %% above marks the end of the Rules section and the beginning
