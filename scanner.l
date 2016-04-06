@@ -111,7 +111,7 @@ BOOLEAN   (true|false)
 [0-9]+                        {yylval.integerConstant=atoi(yytext); return T_IntConstant;}
 [0-9]+u                       {yylval.integerConstant=atoi(yytext); return T_UintConstant;}
 [0-9]+\.[0-9]*[fF]?           {yylval.floatConstant=atof(yytext); return T_FloatConstant;}
-[A-Za-z][A-Za-z0-9]{0,1023}   {strcpy(yylval.identifier,yytext);return T_Identifier;}
+[A-Za-z_][A-Za-z0-9_]{0,1023}   {strcpy(yylval.identifier,yytext);return T_Identifier;}
 [ ]                           {}
 \t                            {currentColNum += 6;}
 "++"                          {return T_Inc;}
