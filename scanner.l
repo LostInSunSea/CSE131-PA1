@@ -2,7 +2,7 @@
  * ----------------
  * Lex input file to generate the scanner for the compiler.
  */
-
+%option stack
 %{
 
 /* The text within this first region delimited by %{ and %} is assumed to
@@ -60,15 +60,16 @@ int currentLineNum, currentColNum;
 BOOLEAN   (true|false)
 
 %x ML_COMMENT
+%x IDENTIFIER
 %%             /* BEGIN RULES SECTION */
  /* All patterns and actions should be placed between the start and stop
   * %% markers which delimit the Rules section. 
   */ 
 
-<INITIAL,ML_COMMENT>[\n]      {currentLineNum++; currentColNum = 1;}
-\/\/.*[\n]                    {currentLineNum++; currentColNum = 1;}
-\/\*                          {BEGIN(ML_COMMENT);}
-<ML_COMMENT>\*\/              {BEGIN(INITIAL);}
+<INITIAL,ML_COMMENT,IDENTIFIER>[\n]  {currentLineNum++; currentColNum = 1;}
+<INITIAL,IDENTIFIER>\/\/.*[\n]       {currentLineNum++; currentColNum = 1;}
+<INITIAL,IDENTIFIER>\/\*             {yy_push_state(ML_COMMENT);}
+<ML_COMMENT>\*\/              {yy_pop_state();}
 <ML_COMMENT>.                 {}
 <ML_COMMENT><<EOF>>           {ReportError::UntermComment();yyterminate();}
 "void"                        {return T_Void;}
@@ -113,8 +114,8 @@ BOOLEAN   (true|false)
 [0-9]+u                       {yylval.integerConstant=atoi(yytext); return T_UintConstant;}
 [0-9]+\.[0-9]*[fF]?           {yylval.floatConstant=atof(yytext); return T_FloatConstant;}
 [A-Za-z_][A-Za-z0-9_]{0,1023}   {strcpy(yylval.identifier,yytext);return T_Identifier;}
-[ ]                           {}
-\t                            {currentColNum= (currentColNum+6)-((currentColNum+6)%8)+1;}
+<INITIAL,IDENTIFIER>[ ]       {}
+<INITIAL,IDENTIFIER>\t        {currentColNum= (currentColNum+6)-((currentColNum+6)%8)+1;}
 "++"                          {return T_Inc;}
 "--"                          {return T_Dec;}
 "<="                          {return T_LessEqual;}
@@ -133,7 +134,9 @@ BOOLEAN   (true|false)
 "}"                           {return T_RightBrace;}
 "["                           {return T_LeftBracket;}
 "]"                           {return T_RightBracket;}
-"."                           {return T_Dot;}
+"."                           {yy_push_state(IDENTIFIER); return T_Dot;}
+<IDENTIFIER>[A-Za-z_][A-Za-z0-9_]+ {strcpy(yylval.identifier,yytext); yy_push_state(INITIAL); return T_FieldSelection;}
+<IDENTIFIER>.                 {yy_pop_state(); currentColNum -= 2;}
 ":"                           {return T_Colon;}
 "="                           {return T_Equal;}
 ";"                           {return T_Semicolon;}
