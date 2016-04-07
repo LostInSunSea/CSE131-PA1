@@ -112,7 +112,14 @@ BOOLEAN   (true|false)
 [0-9]+                        {yylval.integerConstant=atoi(yytext); return T_IntConstant;}
 [0-9]+u                       {yylval.integerConstant=atoi(yytext); return T_UintConstant;}
 [0-9]+\.[0-9]*[fF]?           {yylval.floatConstant=atof(yytext); return T_FloatConstant;}
-[A-Za-z_][A-Za-z0-9_]{0,1023}   {strcpy(yylval.identifier,yytext);return T_Identifier;}
+[A-Za-z_][A-Za-z0-9_]*        {
+                                if(yyleng>1023){
+                                  ReportError::LongIdentifier(&yylloc,yytext);
+                                }
+                                strncpy(yylval.identifier,yytext,31);
+                                yylval.identifier[31]='\0';
+                                return T_Identifier;
+                              }
 [ ]                           {}
 \t                            {currentColNum= (currentColNum+6)-((currentColNum+6)%8)+1;}
 "++"                          {return T_Inc;}
@@ -144,6 +151,7 @@ BOOLEAN   (true|false)
 "<"                           {return T_LeftAngle;}
 ">"                           {return T_RightAngle;}
 "?"                           {return T_Question;}         
+.                             {ReportError::UnrecogChar(&yylloc,*yytext);}       
 %%
 
 /* The closing %% above marks the end of the Rules section and the beginning
