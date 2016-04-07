@@ -113,7 +113,7 @@ BOOLEAN   (true|false)
 [0-9]+\.[0-9]*[fF]?           {yylval.floatConstant=atof(yytext); return T_FloatConstant;}
 [A-Za-z_][A-Za-z0-9_]{0,1023}   {strcpy(yylval.identifier,yytext);return T_Identifier;}
 [ ]                           {}
-\t                            {currentColNum += 6;}
+\t                            {currentColNum= (currentColNum+6)-((currentColNum+6)%8)+1;}
 "++"                          {return T_Inc;}
 "--"                          {return T_Dec;}
 "<="                          {return T_LessEqual;}
@@ -128,10 +128,10 @@ BOOLEAN   (true|false)
 "-="                          {return T_SubAssign;}
 "("                           {return T_LeftParen;}
 ")"                           {return T_RightParen;}
-"{"                           {return T_LeftBracket;}
-"}"                           {return T_RightBracket;}
-"["                           {return T_LeftBrace;}
-"]"                           {return T_RightBrace;}
+"{"                           {return T_LeftBrace;}
+"}"                           {return T_RightBrace;}
+"["                           {return T_LeftBracket;}
+"]"                           {return T_RightBracket;}
 "."                           {return T_Dot;}
 ":"                           {return T_Colon;}
 "="                           {return T_Equal;}
@@ -142,7 +142,7 @@ BOOLEAN   (true|false)
 "/"                           {return T_Slash;}
 "<"                           {return T_LeftAngle;}
 ">"                           {return T_RightAngle;}
-"?"                           {return T_Question;}
+"?"                           {return T_Question;}         
 %%
 
 /* The closing %% above marks the end of the Rules section and the beginning
