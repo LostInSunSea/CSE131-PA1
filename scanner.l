@@ -70,6 +70,7 @@ BOOLEAN   (true|false)
 \/\*                          {BEGIN(ML_COMMENT);}
 <ML_COMMENT>\*\/              {BEGIN(INITIAL);}
 <ML_COMMENT>.                 {}
+<ML_COMMENT><<EOF>>           {ReportError::UntermComment();yyterminate();}
 "void"                        {return T_Void;}
 "bool"                        {return T_Bool;}
 "float"                       {return T_Float;}
